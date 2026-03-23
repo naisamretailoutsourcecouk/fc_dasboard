@@ -18,9 +18,53 @@ python3 -m http.server 4173
 
 Then open `http://127.0.0.1:4173/index.html`.
 
+## Run and host on Firebase
+
+This project now includes Firebase Hosting configuration for direct deployment of the static dashboard.
+
+### Included files
+
+- `firebase.json` serves the repository root as static hosting content.
+- `.firebaseignore` excludes Git, CI, and Firebase local state files from deployment.
+
+### First-time setup
+
+1. Install the Firebase CLI.
+
+   ```bash
+   npm install -g firebase-tools
+   ```
+
+2. Sign in to Firebase.
+
+   ```bash
+   firebase login
+   ```
+
+3. Create or select a Firebase project in the Firebase console.
+4. Link your local repo to that project.
+
+   ```bash
+   firebase use --add
+   ```
+
+### Preview locally with Firebase Hosting
+
+```bash
+firebase emulators:start --only hosting
+```
+
+### Deploy to Firebase Hosting
+
+```bash
+firebase deploy --only hosting
+```
+
+After deployment, Firebase will print your live Hosting URL.
+
 ## Host on GitLab Pages
 
-This project is a static site, so it can be hosted directly on GitLab Pages.
+This project is a static site, so it can also be hosted directly on GitLab Pages.
 
 ### What is included
 

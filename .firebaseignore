@@ -1,0 +1,7 @@
+.git
+.gitignore
+.gitlab-ci.yml
+.firebase
+.firebaseignore
+firebase-debug.log
+firebase-debug.*.log
