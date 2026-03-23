@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amazon FC Stock Sentinel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar glass-card">
+        <div>
+          <div class="brand-pill">⚡ Stock Sentinel</div>
+          <h1>Amazon FC dashboard</h1>
+          <p class="sidebar-copy">
+            Upload FC, inventory, and order reports to analyze DRR, state demand share, and
+            low-stock risks in each fulfilment center.
+          </p>
+        </div>
+
+        <div class="sidebar-section">
+          <span class="section-tag">Alert channels</span>
+          <div class="channel-list">
+            <div class="channel-pill"><span>🟢</span> WhatsApp</div>
+            <div class="channel-pill"><span>✉️</span> Email</div>
+            <div class="channel-pill"><span>💬</span> GChat</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <span class="section-tag">Expected files</span>
+          <ul class="bullet-list">
+            <li>Registered FC code master</li>
+            <li>Inventory ledger by FC and SKU</li>
+            <li>6-month order report</li>
+            <li>30-day order report</li>
+            <li>7-day order report</li>
+          </ul>
+        </div>
+      </aside>
+
+      <main class="dashboard">
+        <section class="hero glass-card">
+          <div>
+            <span class="section-tag">Operations cockpit</span>
+            <h2>Low stock forecasting with FC-wise action recommendations</h2>
+            <p>
+              Use the <strong>Check FC Status</strong> workflow to prepare product-wise state
+              share, compute DRR by FC, and generate alerts whenever stock coverage is below 14
+              days.
+            </p>
+          </div>
+          <div class="hero-actions">
+            <button id="loadSampleBtn" class="secondary-btn">Load sample data</button>
+            <button id="analyzeBtn" class="primary-btn">Check FC Status</button>
+          </div>
+        </section>
+
+        <section class="grid three-up metrics-grid">
+          <article class="metric-card glass-card">
+            <span class="metric-icon">🏭</span>
+            <div>
+              <p class="metric-label">Active FCs</p>
+              <strong id="activeFcCount">0</strong>
+            </div>
+          </article>
+          <article class="metric-card glass-card">
+            <span class="metric-icon">📦</span>
+            <div>
+              <p class="metric-label">Tracked SKU / FC pairs</p>
+              <strong id="skuFcCount">0</strong>
+            </div>
+          </article>
+          <article class="metric-card glass-card status-danger">
+            <span class="metric-icon">🚨</span>
+            <div>
+              <p class="metric-label">Low stock alerts</p>
+              <strong id="alertCount">0</strong>
+            </div>
+          </article>
+        </section>
+
+        <section class="grid two-up upload-grid">
+          <article class="glass-card panel">
+            <div class="panel-heading">
+              <div>
+                <span class="section-tag">Data ingestion</span>
+                <h3>Upload reports</h3>
+              </div>
+              <p class="panel-caption">CSV or JSON arrays supported.</p>
+            </div>
+
+            <div class="upload-stack">
+              <label class="upload-row">
+                <span>1. Registered FC code</span>
+                <input id="fcFile" type="file" accept=".csv,.json" />
+              </label>
+              <label class="upload-row">
+                <span>2. Inventory ledger</span>
+                <input id="inventoryFile" type="file" accept=".csv,.json" />
+              </label>
+              <label class="upload-row">
+                <span>3. 6-month order report</span>
+                <input id="orders6mFile" type="file" accept=".csv,.json" />
+              </label>
+              <label class="upload-row">
+                <span>4. 30-day order report</span>
+                <input id="orders30File" type="file" accept=".csv,.json" />
+              </label>
+              <label class="upload-row">
+                <span>5. 7-day order report</span>
+                <input id="orders7File" type="file" accept=".csv,.json" />
+              </label>
+            </div>
+
+            <details class="schema-help">
+              <summary>Suggested column names</summary>
+              <div class="schema-grid">
+                <div>
+                  <h4>FC master</h4>
+                  <p><code>fc_code</code>, <code>fc_name</code>, <code>state</code>, <code>city</code></p>
+                </div>
+                <div>
+                  <h4>Inventory</h4>
+                  <p><code>fc_code</code>, <code>sku</code>, <code>product_name</code>, <code>units</code></p>
+                </div>
+                <div>
+                  <h4>Orders</h4>
+                  <p>
+                    <code>order_date</code>, <code>fc_code</code>, <code>sku</code>,
+                    <code>product_name</code>, <code>state</code>, <code>city</code>, <code>units</code>
+                  </p>
+                </div>
+              </div>
+            </details>
+          </article>
+
+          <article class="glass-card panel">
+            <div class="panel-heading">
+              <div>
+                <span class="section-tag">Alert preparation</span>
+                <h3>Notification routing</h3>
+              </div>
+              <p class="panel-caption">Prepared from the alert engine output.</p>
+            </div>
+
+            <div class="channel-config-grid">
+              <label>
+                <span>WhatsApp numbers</span>
+                <textarea id="whatsappTargets" rows="3" placeholder="+1 555-0101, +1 555-0102"></textarea>
+              </label>
+              <label>
+                <span>Email recipients</span>
+                <textarea id="emailTargets" rows="3" placeholder="ops@example.com, planning@example.com"></textarea>
+              </label>
+              <label>
+                <span>Google Chat webhook / room</span>
+                <textarea id="gchatTargets" rows="3" placeholder="Space: FC Planning War Room"></textarea>
+              </label>
+            </div>
+            <p class="helper-copy">
+              This dashboard prepares alert-ready summaries for WhatsApp, email, and GChat. You can
+              connect the payloads to actual APIs in the next backend step.
+            </p>
+          </article>
+        </section>
+
+        <section class="grid two-up">
+          <article class="glass-card panel">
+            <div class="panel-heading">
+              <div>
+                <span class="section-tag">FC health</span>
+                <h3>FC status table</h3>
+              </div>
+              <p class="panel-caption">Stock coverage vs. DRR.</p>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>FC</th>
+                    <th>SKU</th>
+                    <th>Current stock</th>
+                    <th>DRR</th>
+                    <th>Days cover</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="fcStatusBody">
+                  <tr class="empty-row">
+                    <td colspan="6">Upload data and click “Check FC Status”.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="glass-card panel">
+            <div class="panel-heading">
+              <div>
+                <span class="section-tag">Demand intelligence</span>
+                <h3>Product-wise state share</h3>
+              </div>
+              <p class="panel-caption">Derived from the 6-month order report.</p>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>SKU</th>
+                    <th>Product</th>
+                    <th>State</th>
+                    <th>Units</th>
+                    <th>Share %</th>
+                  </tr>
+                </thead>
+                <tbody id="stateShareBody">
+                  <tr class="empty-row">
+                    <td colspan="5">State demand share will appear here.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="grid two-up">
+          <article class="glass-card panel">
+            <div class="panel-heading">
+              <div>
+                <span class="section-tag">Action queue</span>
+                <h3>Low stock alerts</h3>
+              </div>
+              <p class="panel-caption">Only items below 14 days of stock cover are shown.</p>
+            </div>
+            <div id="alertsList" class="alert-list empty-state">
+              No alerts generated yet.
+            </div>
+          </article>
+
+          <article class="glass-card panel">
+            <div class="panel-heading">
+              <div>
+                <span class="section-tag">Prepared payloads</span>
+                <h3>Message preview</h3>
+              </div>
+              <p class="panel-caption">Reusable summary for all configured channels.</p>
+            </div>
+            <pre id="messagePreview" class="message-preview">No alert message prepared yet.</pre>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
